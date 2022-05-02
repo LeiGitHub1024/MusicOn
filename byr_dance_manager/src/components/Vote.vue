@@ -40,7 +40,7 @@ export default {
   },
 
   created(){
-    axios.get( 'api/music/getTop').then((res) => {
+    axios.get( 'http://127.0.0.1:8080/music/getTop').then((res) => {
       // 接口调用成功回调
       console.log('success',res,res?.data);
       this.voted = res?.data?.code? true:false
@@ -97,7 +97,7 @@ export default {
   
     },
     nextVote(){
-      axios.post( 'api/music/reset').then((res) => {
+      axios.post( 'http://127.0.0.1:8080/music/reset').then((res) => {
       console.log('success',res,res?.data);
       }).catch((error) => {
         console.log('err',error);

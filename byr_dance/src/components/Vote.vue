@@ -80,7 +80,7 @@ export default {
       this.selectedName=""
       this.musicList=[]
       this.bk=[]
-      axios.get( 'api/music/getTop').then((res) => {
+      axios.get( 'http://127.0.0.1:8080/music/getTop').then((res) => {
         console.log('success',res,res?.data);
         this.voted = res?.data?.code? true:false
         res?.data?.data?.forEach((item,index)=>{
@@ -116,7 +116,7 @@ export default {
         this.$message.info('请选择一个歌曲，或手动输入歌名后投票')
       }else{
         this.loading=true
-        axios.post( 'api/music/addCount',{name:this.inputValue||this.selectedName}).then((res) => {
+        axios.post( 'http://127.0.0.1:8080/music/addCount',{name:this.inputValue||this.selectedName}).then((res) => {
           console.log('success',res);
           this.loading=false
           this.voted=true
