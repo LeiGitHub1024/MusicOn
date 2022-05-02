@@ -1,17 +1,23 @@
 <template>
 <div>
   <a-space>
-    <a-list >
+   <a-list :virtualListProps="{
+      height: 450,
+    }"
+    :data="musicList">
       <template #header>
-        <span class='left'>    歌曲名称  </span>
-        <span class="right">   数量</span>
+        <span class='left'> 歌曲名称 </span>
+        <span class="right"> 数量</span>
       </template>
-      <a-list-item v-bind:style="{'background-color':bk[music.key],}" v-for="music in musicList" :key="music.key" @click="chooseMusic(music.key)">
-        <content style="display:flex">
-        <span class='left'> {{music.name}} </span>
-        <span class="right"> {{music.vote}} </span>
-        </content>
-      </a-list-item>
+      <template  #item="{ item }">
+          <a-list-item style="padding:0" :key="item.key" @click="chooseMusic(item.key, item.name)">
+            <div style="display:flex;padding:13px 20px" :style="{'background-color':bk[item.key]}">
+                <span class='left'> {{item.name}} </span>
+                <span class="right"> {{item.vote}} </span>
+            </div>
+          </a-list-item>
+      </template>
+    
     </a-list>
     
   </a-space>
