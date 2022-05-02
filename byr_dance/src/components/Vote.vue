@@ -1,18 +1,37 @@
 <template>
 <div>
-  <div style="margin:1rem">1.选择歌曲或者在下方输入<div></div>  2.点击投票</div>
+  <div style="margin:1rem">第一步：选择歌曲或者在下方输入<div style="margin-top:0.5rem"></div>  第二步：点击投票</div>
   <a-space>
-    <a-list >
+    <!-- <a-list >
       <template #header>
         <span class='left'>    歌曲名称  </span>
         <span class="right">   数量</span>
       </template>
-      <a-list-item v-bind:style="{'background-color':bk[music.key],}" v-for="music in musicList" :key="music.key" @click="chooseMusic(music.key, music.name)">
+      <a-list-item  v-bind:style="{'background-color':bk[music.key],}" v-for="music in musicList" :key="music.key" @click="chooseMusic(music.key, music.name)">
         <content style="display:flex">
         <span class='left'> {{music.name}} </span>
         <span class="right"> {{music.vote}} </span>
         </content>
       </a-list-item>
+    </a-list> -->
+
+    <a-list :virtualListProps="{
+      height: 450,
+    }"
+    :data="musicList">
+      <template #header>
+        <span class='left'> 歌曲名称 </span>
+        <span class="right"> 数量</span>
+      </template>
+      <template  #item="{ item }">
+          <a-list-item style="padding:0" :key="item.key" @click="chooseMusic(item.key, item.name)">
+            <div style="display:flex;padding:13px 20px" :style="{'background-color':bk[item.key]}">
+                <span class='left'> {{item.name}} </span>
+                <span class="right"> {{item.vote}} </span>
+            </div>
+          </a-list-item>
+      </template>
+    
     </a-list>
     
   </a-space>
@@ -26,7 +45,6 @@
       <!-- <div class='button'> <a-button  @click="refresh" type="primary">刷新</a-button> </div> -->
     </div>
   </operator>
-
   <!-- <button @click="testButton">Test Button</button> -->
   <footer class="footer">版权所有 © 北京邮电大学 小胖 & 阿廖沙 <br/> 计算机学院（国家示范性软件学院）</footer>
 </div>
@@ -36,6 +54,7 @@
 <script>
 import axios from "axios";
 // import { ref } from 'vue'
+import { Modal } from '@arco-design/web-vue';
 
 export default {
   name:"VotePage",
@@ -76,10 +95,13 @@ export default {
     },
     chooseMusic(idx,name){ //选中音乐修改样式
       if(!this.voted){
-        this.bk = new Array(10).fill('')
+        
+        this.bk = new Array(41).fill('')
         this.bk[idx]='#FF8C32'
         this.selected = idx
         this.selectedName = name
+        console.log(idx,name,this.bk);
+
       }
     },
     inputFocus(){//点击输入框清空样式
@@ -100,6 +122,14 @@ export default {
           this.voted=true
           //TODO 刷新一下投票值
           this.getSourceData()
+          let modalMessage = res?.data?.data||'每分钟只能投一次哟'
+          Modal.success({
+            title: '投票成功',
+            content:  (<div style="text-align:center">{modalMessage}</div>),
+            width:'70vw',
+            "modal-class":"modal",
+            "align-center":true,
+          });
           setTimeout(() => {
             this.getSourceData()
           }, 60000);
@@ -148,10 +178,13 @@ export default {
   .footer{
     position: relative;
     bottom: 0;
-    margin-top: 5rem;
+    margin-top: 2rem;
     margin-bottom: 2rem;
     left:50%;
     transform: translate(-50%,0);
+  }
+  .modal{
+    text-align: center;
   }
 
 </style>
