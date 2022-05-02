@@ -28,7 +28,7 @@
   </operator>
 
   <!-- <button @click="testButton">Test Button</button> -->
-  <footer class="footer">created by 阿廖沙 小胖 </footer>
+  <footer class="footer">版权所有 © 北京邮电大学 小胖 & 阿廖沙 <br/> 计算机学院（国家示范性软件学院）</footer>
 </div>
   
 </template>
@@ -146,9 +146,10 @@ export default {
     margin-top:1rem ;
   }
   .footer{
-    position: fixed;
+    position: relative;
     bottom: 0;
-    margin-bottom: 1rem;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
     left:50%;
     transform: translate(-50%,0);
   }
