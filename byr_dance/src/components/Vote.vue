@@ -1,12 +1,13 @@
 <template>
 <div>
+  <div style="margin:1rem">1.选择歌曲或者在下方输入<div></div>  2.点击投票</div>
   <a-space>
     <a-list >
       <template #header>
         <span class='left'>    歌曲名称  </span>
         <span class="right">   数量</span>
       </template>
-      <a-list-item v-bind:style="{'background-color':bk[music.index],}" v-for="music in musicList" :key="music.index" @click="chooseMusic(music.index)">
+      <a-list-item v-bind:style="{'background-color':bk[music.key],}" v-for="music in musicList" :key="music.key" @click="chooseMusic(music.key, music.name)">
         <content style="display:flex">
         <span class='left'> {{music.name}} </span>
         <span class="right"> {{music.vote}} </span>
@@ -21,7 +22,7 @@
       <div class='button'> <a-button  @click="submit" type="primary" size="large" :loading="loading">投票</a-button> </div>
     </div>
     <div v-else>
-      <div style="margin:1rem">您已成功投票</div>
+      <div style="margin:1rem">您已成功投票，每分钟只能投一次</div>
       <!-- <div class='button'> <a-button  @click="refresh" type="primary">刷新</a-button> </div> -->
     </div>
   </operator>
@@ -34,64 +35,79 @@
 
 <script>
 import axios from "axios";
+// import { ref } from 'vue'
 
 export default {
   name:"VotePage",
   components: {
   },
-  setup(props) {
-    console.log(props,'调用get接口请求数据');
-    //TODO 调用getData接口，赋值musicList、voteFlag
-  
+  created(){
+    this.getSourceData()
   },
   data() {
     return {
       selected:'0', //选中id
+      selectedName:"",//选中名称
       inputValue:'', //用户输入的歌曲名称
       voted:false, //该ip是否已经投票
       loading:false,
-      musicList:[ //音乐列表
-        {index:'1',name:"双节棍棍棍棍棍棍棍棍棍棍棍棍棍棍棍棍棍棍", vote:2333333333333333},
-        {index:'2',name:"asdfsdf", vote:2333},
-        {index:'3',name:"双节23棍", vote:223},
-        {index:'4',name:"asdfsad", vote:213},
-        {index:'5',name:"adsfsdafa", vote:23},
-        {index:'6',name:"双节23棍", vote:23},
-        {index:'7',name:"双节23棍", vote:23},
-        {index:'8',name:"双节23棍", vote:23},
-        {index:'9',name:"双节23棍", vote:11},
-        {index:'10',name:"双节23棍", vote:3},
-
-      ],
+      musicList:[],
       bk:[]//选中背景颜色
     }
   },
   methods: {
-    chooseMusic(idx){ //选中音乐修改样式
+    getSourceData(){
+      this.selected=""
+      this.selectedName=""
+      this.musicList=[]
+      this.bk=[]
+      axios.get( 'api/music/getTop').then((res) => {
+        console.log('success',res,res?.data);
+        this.voted = res?.data?.code? true:false
+        res?.data?.data?.forEach((item,index)=>{
+          this.musicList.push({
+            key:index,
+            name:item.value,
+            vote:item.score
+          })
+        })
+        }).catch((error) => {console.log('err',error);});
+          
+    },
+    chooseMusic(idx,name){ //选中音乐修改样式
       if(!this.voted){
         this.bk = new Array(10).fill('')
         this.bk[idx]='#FF8C32'
         this.selected = idx
+        this.selectedName = name
       }
     },
     inputFocus(){//点击输入框清空样式
       if(!this.voted){
         this.bk = new Array(10).fill('')
         this.selected = '0'
+        this.selectedName = ''
       }
     },
     submit(){//提交数据
       if(this.selected==0&&this.inputValue==''){
-        console.log(1);
         this.$message.info('请选择一个歌曲，或手动输入歌名后投票')
       }else{
         this.loading=true
-        setTimeout(() => {
+        axios.post( 'api/music/addCount',{name:this.inputValue||this.selectedName}).then((res) => {
+          console.log('success',res);
           this.loading=false
-          console.log(this.selected, this.inputValue);
-        //TODO 请求接口，成功之后跳转到刷新界面
-        this.voted=true
-        }, 1000);
+          this.voted=true
+          //TODO 刷新一下投票值
+          this.getSourceData()
+          setTimeout(() => {
+            this.getSourceData()
+          }, 60000);
+          
+        }).catch((error) => {
+          console.log('err',error);
+        });
+      
       }
   
     },
@@ -99,28 +115,28 @@ export default {
     //   console.log("刷新数据")
     // },
     testButton(){
-      axios.post( 'api/https://photo.sina.cn/aj/index',{page:1,cate:'recommend'}).then((res) => {
+      axios.post( 'api/music/addCount',{name:'张三99994'}).then((res) => {
       // 接口调用成功回调
       console.log('success',res);
-      
-    }).catch((error) => {
-      // 接口调用失败毁掉
-      console.log('err',error);
-    });
+        
+      }).catch((error) => {
+        // 接口调用失败毁掉
+        console.log('err',error);
+      });
     }
   },
 }
 </script>
 <style >
   .left{
-    width: 70vw;
+    width: 60vw;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space:nowrap; 
     display: inline-block;
   }
   .right{
-    width: 10vw;
+    width: 20vw;
     overflow: hidden;
     text-overflow:ellipsis;
     white-space:nowrap; 

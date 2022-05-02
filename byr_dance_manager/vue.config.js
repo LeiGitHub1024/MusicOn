@@ -3,9 +3,6 @@ module.exports = defineConfig({
   transpileDependencies: true
 })
 module.exports = {
-  publicPath: './',
-  assetsDir: 'static',
-  parallel: false,
   devServer: {
       port:8000,
       proxy: {
