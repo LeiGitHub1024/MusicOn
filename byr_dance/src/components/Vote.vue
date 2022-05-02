@@ -66,7 +66,7 @@ export default {
         this.voted = res?.data?.code? true:false
         res?.data?.data?.forEach((item,index)=>{
           this.musicList.push({
-            key:index,
+            key:index+1,
             name:item.value,
             vote:item.score
           })
