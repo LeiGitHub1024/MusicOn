@@ -15,23 +15,19 @@
       </a-list-item>
     </a-list> -->
 
-    <a-list :virtualListProps="{
-      height: 450,
-    }"
-    :data="musicList">
+    <a-list :virtualListProps="{height: 450,}" :data="musicList" @click="proxyChooseMusic()">
       <template #header>
         <span class='left'> 歌曲名称 </span>
         <span class="right"> 数量</span>
       </template>
       <template  #item="{ item }">
-          <a-list-item style="padding:0" :key="item.key" @click="chooseMusic(item.key, item.name)">
-            <div style="display:flex;padding:13px 20px" :style="{'background-color':bk[item.key]}">
+          <a-list-item style="padding:0" :key="item.key" >
+            <div style="display:flex;padding:13px 20px" :id=item.key class="event-list-item" :style="{'background-color':bk[item.key]}">
                 <span class='left'> {{item.name}} </span>
                 <span class="right"> {{item.vote}} </span>
             </div>
           </a-list-item>
       </template>
-    
     </a-list>
     
   </a-space>
@@ -46,7 +42,7 @@
     </div>
   </operator>
   <!-- <button @click="testButton">Test Button</button> -->
-  <footer class="footer">版权所有 © 北京邮电大学 小胖 & 阿廖沙 <br/> 计算机学院（国家示范性软件学院）</footer>
+  <footer class="footer">版权所有 © 北京邮电大学 小胖 & 阿廖沙 & Ivan <br/> 计算机学院（国家示范性软件学院）</footer>
 </div>
   
 </template>
@@ -93,15 +89,26 @@ export default {
         }).catch((error) => {console.log('err',error);});
           
     },
-    chooseMusic(idx,name){ //选中音乐修改样式
+    // chooseMusic(idx,name){ //选中音乐修改样式
+    //   if(!this.voted){
+    //     this.bk = new Array(41).fill('')
+    //     this.bk[idx]='#FF8C32'
+    //     this.selected = idx
+    //     this.selectedName = name
+    //     console.log(idx,name,this.bk);
+    //   }
+    // },
+    proxyChooseMusic(){ //使用事件代理，选中音乐修改样式
+      let target = window.event.target
+      while(target.className!=='event-list-item'){ //如果点到里面的span，需要向外找
+        target = target.parentElement
+      }      
       if(!this.voted){
-        
         this.bk = new Array(41).fill('')
-        this.bk[idx]='#FF8C32'
-        this.selected = idx
-        this.selectedName = name
-        console.log(idx,name,this.bk);
-
+        this.bk[target.id]='#FF8C32'
+        this.selected = ''+target.id
+        this.selectedName = this.musicList[target.id-1].name
+        // console.log(target.id,target.name,this.bk);
       }
     },
     inputFocus(){//点击输入框清空样式
